@@ -1,16 +1,34 @@
-# main.py
-from nfa import regex_to_nfa
-from stack import regexp_a_postfix  # Aquí importas tu función existente
+import nfa
+import stack #AKA EL ALGORITMO DE SHUNTIN YAND
 
-# Expresión regular en infix
-infix_regex = '(b|b)*abb(a|b)*'
 
-# Usa la función que ya tienes para convertir a postfix
-postfix_regex = ''.join(regexp_a_postfix(infix_regex))  # Asegúrate de que devuelva una lista y la unes a una cadena
-print(f'Postfix: {postfix_regex}')  # Para verificar la conversión
+#Declara el stack utilizado para hacer el algoritmo de SHUNTING
+output_stack = stack.estack()
 
-# Generar AFN a partir de la expresión regular en postfix
-nfa = regex_to_nfa(postfix_regex)
-print(f"AFN creado con estado inicial: {nfa.start_state}")
 
-# (Opcional) Aquí puedes continuar con la conversión del AFN a AFD o graficar el AFN
+
+
+print("Bienvenidos\nPor favor inserten la expresion regular")
+
+print("Tomar nota de estos simbolos\noperadores:\n | OR uso: (a|b)\n * Estrella kleen uso: b* ")
+
+print(f"\033[1;31;40m EJEMPLO DE PRUEBA :\033[0m   (b|b)*abb(a|b)*\n\n" )
+
+
+#Valores de prueba '(b|b)*abb(a|b)*'
+lenguaje = input("Ingrese su expresion regular\n")
+
+#De la clase STACK REALIZA EL ALGORITMO DE SHUNTING YAND
+stack.regexp_a_postfix(lenguaje, output_stack)
+
+
+#Regexp a postfix en lista
+# print(output_stack.getstack())
+
+#GUARDA LA EXPRESION QUE RETORNO DE LA CLASE STACK
+postfix_expression =  stack.list_to_exp(output_stack.getstack())
+
+print(f"\033[1;34;40m EXPRESION A POSTFIX :\033[0m",  postfix_expression)
+
+
+#postfix_expression es la expresion ya en postfix Utilizarlo para Thompson

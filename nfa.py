@@ -48,5 +48,3 @@ def regex_to_nfa(postfix_regex):
             stack.append(NFA(nfa1.start_state, nfa2.accept_state))
 
     return stack.pop()
-
-prueba = NFA

@@ -44,18 +44,17 @@ class estack:
         self.lista = []
             
 
-lenguaje = '(b|b)*abb(a|b)*'
-    
-token = set('(b|b)*abb(a|b)*')
-operations = set( '+*|' )
-parenthesis = set( '()')
-tr = token - operations - parenthesis
 
-operator_stack = estack()
-output_stack = estack()
 
-def regexp_a_postfix(expresion):
-    print("Regexp a Postfix")
+
+
+
+def regexp_a_postfix(expresion  , output_stack):
+    operator_stack = estack()
+    token = set(expresion)
+    operations = set( '+*|' )
+    parenthesis = set( '()')
+    tr = token - operations - parenthesis
     for i in expresion:
         # operador
         if (operator_stack.getvalue()+i == ')+') or (operator_stack.getvalue()+i == ')*'):
@@ -88,98 +87,15 @@ def regexp_a_postfix(expresion):
     for e in operator_stack.getstack():
         if e != "(":
             output_stack.push(i)
-
-            
-regexp_a_postfix(lenguaje)
-
-operator_stack.limpiarstack()
-
-#Regexp a postfix
-print(output_stack.getstack())
-
-
-print(tr)
-
-pr = []
-
-
-trdict = {key: 0 for key in tr}
-
-for li in lenguaje:
-
-    for k in tr:
-        if(k == li):
-            trdict[k] = trdict[k] + 1
-            li = li + str(trdict[k])
-        
-    pr.append(li)
-
-
-
-##VALORES Iniciales EMPIEZAN AQUI
-
-
-inicial = True
-
-contador = 0
-after_val = True
-count_parenthesis = 0
-
-
-prinicial = estack()
-
-while inicial:
-    #Si es una letra entonces hay dos casos si a la derecha hay un operador entonces no termina el inicial
-    if  list(pr[contador])[0] in tr:
-        after_val = True
-        try:
-            #operacion son +*|
-            if list(pr[contador+1])[0] == '|':
-                prinicial.push(pr[contador])
-            if list(pr[contador+1])[0] == '*':
-                after_val = False
-                prinicial.push(pr[contador])
-            if list(pr[contador+1])[0] == '+':
-                inicial = False
-                after_val = False
-                prinicial.push(pr[contador])
-            if list(pr[contador+1])[0] == ')' and list(pr[contador+2])[0] == '*':
-                prinicial.push(pr[contador])
-            if list(pr[contador+1])[0] == ')' and list(pr[contador+2])[0] == '+':
-                prinicial.push(pr[contador])
-                inicial = False
-
-            elif count_parenthesis == 0:
-                if after_val:
-                    prinicial.push(pr[contador])
-                    inicial = False
-        except:
-            print("No existe said operacion")
-            inicial = False
-    if list(pr[contador])[0] in parenthesis:
-        
-        if list(pr[contador])[0] == '(':
-            count_parenthesis = count_parenthesis + 1
-        if list(pr[contador])[0] == ')':
-            count_parenthesis = count_parenthesis - 1
-    contador += 1
-        
-print('valores', prinicial.getstack())
-
-##VALORES FINALES EMPIEZAN AQUI
-        
-print(pr)
-
-
-prfinal = estack()
-
-for i in pr:
-    prfinal.push(i)
     
-estado = True
-while estado:
-    for e in prfinal.getstack():
-        if prfinal.peek() == '*':
-            print()
+    operator_stack.limpiarstack()
+    return output_stack
 
+
+def list_to_exp(lista):
+    exp = ''
+    for i in lista:
+        exp = exp + str(i)
+    
+    return exp
 
