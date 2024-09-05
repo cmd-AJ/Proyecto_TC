@@ -10,9 +10,13 @@ output_stack = stack.estack()
 
 print("Bienvenidos\nPor favor inserten la expresion regular")
 
-print("Tomar nota de estos simbolos\noperadores:\n | OR uso: (a|b)\n * Estrella kleen uso: b* ")
+print("Tomar nota de estos simbolos\noperadores:\n | OR uso: (a|b)\n * Estrella kleen uso: b*")
+
+print(f"\033[1;33;40m TOMAR NOTA NO ES NECESARIO PONER • el algoritmo lo realiza por si mismo \033[0m " )
 
 print(f"\033[1;31;40m EJEMPLO DE PRUEBA :\033[0m   (b|b)*abb(a|b)*\n\n" )
+
+
 
 
 #Valores de prueba '(b|b)*abb(a|b)*'
