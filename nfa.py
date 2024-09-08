@@ -1,12 +1,10 @@
 import json
-from graphviz import Digraph
-
 
 class State:
     def __init__(self, name, is_accept=False):
         self.name = name
-        self.transitions = {}  # Transiciones regulares
-        self.epsilon_transitions = []  # Transiciones epsilon
+        self.transitions = {}
+        self.epsilon_transitions = []
         self.is_accept = is_accept
 
 class NFA:
@@ -16,7 +14,7 @@ class NFA:
 
 def regex_to_nfa(postfix_regex):
     stack = []
-    state_count = 0  # Para generar nombres únicos de estados
+    state_count = 0
 
     def new_state(is_accept=False):
         nonlocal state_count
@@ -25,13 +23,13 @@ def regex_to_nfa(postfix_regex):
         return state
 
     for char in postfix_regex:
-        if char.isalnum():  # Si es un símbolo del alfabeto
+        if char.isalnum():  # Símbolo del alfabeto
             start_state = new_state()
             accept_state = new_state(is_accept=True)
             start_state.transitions[char] = accept_state
             stack.append(NFA(start_state, accept_state))
 
-        elif char == '*':  # Operador Kleene
+        elif char == '*':  # Estrella de Kleene
             nfa = stack.pop()
             start_state = new_state()
             accept_state = new_state(is_accept=True)
@@ -40,7 +38,7 @@ def regex_to_nfa(postfix_regex):
             nfa.accept_state.epsilon_transitions.append(accept_state)
             stack.append(NFA(start_state, accept_state))
 
-        elif char == '|':  # Alternación (OR)
+        elif char == '|':  # Operador OR
             nfa2 = stack.pop()
             nfa1 = stack.pop()
             start_state = new_state()
@@ -54,13 +52,13 @@ def regex_to_nfa(postfix_regex):
         elif char == '.':  # Concatenación
             nfa2 = stack.pop()
             nfa1 = stack.pop()
+            nfa1.accept_state.is_accept = False  # El estado intermedio ya no es de aceptación
             nfa1.accept_state.epsilon_transitions.append(nfa2.start_state)
-            nfa1.accept_state.is_accept = False
             stack.append(NFA(nfa1.start_state, nfa2.accept_state))
 
     final_nfa = stack.pop()
 
-    # Crear estructura para el archivo JSON
+    # Crear el JSON
     nfa_dict = {
         "Q": [],
         "sigma": [],
@@ -69,28 +67,34 @@ def regex_to_nfa(postfix_regex):
         "FUNC": []
     }
 
+    visited = set()
+
     def add_state_to_json(state):
-        if state.name not in nfa_dict["Q"]:
+        if state.name not in visited:
+            visited.add(state.name)
             nfa_dict["Q"].append(state.name)
+
             if state.is_accept:
                 nfa_dict["F"].append(state.name)
+
             for symbol, next_state in state.transitions.items():
                 nfa_dict["FUNC"].append(f"{state.name},{symbol},{next_state.name}")
                 if symbol not in nfa_dict["sigma"]:
                     nfa_dict["sigma"].append(symbol)
                 add_state_to_json(next_state)
+
             for epsilon_state in state.epsilon_transitions:
                 nfa_dict["FUNC"].append(f"{state.name},ε,{epsilon_state.name}")
                 add_state_to_json(epsilon_state)
 
     add_state_to_json(final_nfa.start_state)
 
-    # Guardar el NFA como archivo .json
+    # Guardar el JSON
     with open('nfa_output.json', 'w') as f:
         json.dump(nfa_dict, f, indent=4)
 
     return final_nfa
 
-# Ejemplo de uso:
-postfix_expression = "bb|*a.bb.a|*"  # Expresión en postfix
+# Ejemplo de uso
+postfix_expression = "aab|*"  # Usamos la expresión en postfix
 nfa = regex_to_nfa(postfix_expression)
