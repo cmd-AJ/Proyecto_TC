@@ -47,7 +47,7 @@ class minimize_dfa:
         
         lista_transisiones = []
         for i in self.transitiones:
-            lista = i.split(',')
+            lista = i.split('->')
             lista[0] = self.reverse_dic[lista[0]]
             lista[2] = self.reverse_dic[lista[2]]
             lista_transisiones.append(lista[0] + ',' + lista[1] + ',' + lista[2])
@@ -94,7 +94,7 @@ class minimize_dfa:
             'Estados': self.statesLetters
         }
         for e in headers:
-            emptydata[e] = ['0']*len(headers)
+            emptydata[e] = ['0']*len(self.statesLetters)
         df = pandas.DataFrame(emptydata, index=list(self.statesLetters), columns=headers)
         #Aceptacion
         for k in self.letteraccept:
@@ -103,14 +103,29 @@ class minimize_dfa:
                 s = '--> '
             else:
                 s = ''
-            df.loc[k, 'salida'] = s + str(1)
-                
-        
+            df.loc[k, 'salida'] = s + str(1)   
+        for k in self.inicial:
+            df.loc[k, 'salida'] = '--> ' + df.loc[k, 'salida']
             
         for k in self.transitiones:
             k = k.split(',')
             df.loc[ str(k[0]), str(k[1]) ] = str(k[2])
-            
+        
+        hasnnul = False
+        for e in headers:
+            for i in self.statesLetters:
+                if df.loc[i, e] == '0' and (e != 'salida'):
+                    df.loc[i, e] = 'QT'
+                    hasnnul = True
+        
+        if hasnnul == True:
+            dictionary = {key: ['QT'] for key in headers}
+            dictionary['salida'] = ['0']
+            nullrow  = pandas.DataFrame(dictionary, index=['QT'])
+            df = pandas.concat([df, nullrow])
+            self.statesLetters.append('QT')
+
+        
         return df
     
     def minimizacion_tabla(self):
@@ -128,19 +143,16 @@ class minimize_dfa:
         emptydata = {
             'Estados': self.statesLetters 
         }
-        contador = 1
-        contadormas = 1
-        
-        while (len(self.statesLetters) - 1) >= contadormas:
-            emptydata[self.statesLetters[contadormas]] = ['0']*(contador)
-            x = 1
-            while (len(self.statesLetters) - x)  > len(emptydata[self.statesLetters[contadormas]]):
-                emptydata[self.statesLetters[contadormas]].append('X')
-                x += 1
-                
+        contador = 0
+
+        for i in columns:
+            emptydata[i] = ['0']*(len(columns)- contador)
             
+            
+            while len(emptydata[i]) < len(columns):
+                emptydata[i].append('-')
             contador += 1
-            contadormas += 1
+
             
         columns = sorted(columns, reverse=True)
         df = pandas.DataFrame(emptydata, index=indexing, columns=columns)
@@ -149,7 +161,7 @@ class minimize_dfa:
         return df
         
         
-s = minimize_dfa( 'copia.json')
+s = minimize_dfa( 'dfa.json')
 s.convertir_subconjuntos_a_letras()
 
 
@@ -178,4 +190,4 @@ print(s.minimizacion_tabla())
 
 #Hacer Si encuentra una pareja en las columnas 0 o 1 de la primera tabla
 #Por lo tanto necesita recorrer la primera fila y la segunda fila de la columna 0 por ejemplo
-#Si lo encuentra que lo ponga el simbolo '-'
+#Si lo encuentra que lo ponga el simbolo 'X'  que significa que ya paso

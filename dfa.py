@@ -12,18 +12,18 @@ class DFA:
 
         def frozenset_to_list(fset):
             return [state.name for state in fset]
+        
 
-
-        transitions_serializable = {}
+        transitions_serializable = []
         for (state_set, symbol), next_state_set in self.transitions.items():
-            transitions_serializable[f"({frozenset_to_list(state_set)}, {symbol})"] = frozenset_to_list(next_state_set)
+            transitions_serializable.append(f"{str(set(frozenset_to_list(state_set)))}->{symbol}->{str(set(frozenset_to_list(next_state_set)))}")
 
 
         json_data = {
-            "ESTADOS": [frozenset_to_list(state_set) for state_set in self.states],
+            "ESTADOS": [str(set(frozenset_to_list(state_set))) for state_set in self.states],
             "SIMBOLOS": list(alphabet),  # Assuming binary symbols, can be modified
-            "INICIO": frozenset_to_list(self.start_state),
-            "ACEPTACION": [frozenset_to_list(state_set) for state_set in self.accept_states],
+            "INICIO": [str(set(frozenset_to_list(self.start_state)))],
+            "ACEPTACION": [str(set(frozenset_to_list(state_set))) for state_set in self.accept_states],
             "TRANSICIONES": transitions_serializable
         }
 
