@@ -1,6 +1,6 @@
 # main.py
 from nfa import regex_to_nfa  # Importamos la función regex_to_nfa desde nfa.py
-from stack import regexp_a_postfix  # Importamos la función regexp_a_postfix desde stack.py
+from stack import list_to_exp, regexp_a_postfix_v2  # Importamos la función regexp_a_postfix desde stack.py
 from dfa import nfa_to_dfa  # Mantén esta importación si tienes un archivo dfa.py
 
 # Declara el stack utilizado para hacer el algoritmo de Shunting Yard
@@ -17,8 +17,8 @@ def main():
     lenguaje = input("Ingrese su expresión regular:\n")
 
     try:
-        # Realiza el algoritmo de Shunting Yard para convertir a postfix
-        postfix_expression = regexp_a_postfix(lenguaje)
+        postfix_expression = regexp_a_postfix_v2(lenguaje, output_stack)
+        print()
         print(f"\033[1;34;40m EXPRESIÓN EN POSTFIX :\033[0m", postfix_expression)
     except Exception as e:
         print(f"Error al convertir la expresión a postfix: {e}")

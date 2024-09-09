@@ -44,60 +44,79 @@ class estack:
         self.lista = []
             
 
-
-
-
-
-
-def regexp_a_postfix(expresion  , output_stack):
-    operator_stack = estack()
-    token = set(expresion)
-    operations = set( '+*|' )
-    parenthesis = set( '()')
-    tr = token - operations - parenthesis
-    for i in expresion:
-        # operador
-        if (operator_stack.getvalue()+i == ')+') or (operator_stack.getvalue()+i == ')*'):
-            output_stack.push(i)
-            i = 'null'
-            operator_stack.keepvalue('')
-            
-        if (operator_stack.getvalue() in tr) and (i in tr) and (operator_stack.peek() != '|'):
-            output_stack.push('•')
-            operator_stack.keepvalue('')
-
-        if i == '(' :
-            operator_stack.push(i)
-        elif i in tr:
-            output_stack.push(i) 
-            operator_stack.keepvalue(i)
-        elif i in operations:
-            if (i != '|'):
-                output_stack.push(str(i))
-            else:
-                operator_stack.push(str(i))
-            
-        elif i == ")":
-            operador = operator_stack.peek()
-            operator_stack.poplista()
-            output_stack.push(operador)
-            operator_stack.keepvalue(')')
-        
-    if (list(expresion)[len(expresion)-1] == '*' and list(expresion)[len(expresion)-2] in tr ) or list(expresion)[len(expresion)-1] in tr :
-        output_stack.push('•')
-        
-
-    for e in operator_stack.getstack():
-        if e != "(":
-            output_stack.push(i)
-    
-    operator_stack.limpiarstack()
-    return output_stack
-
-
 def list_to_exp(lista):
     exp = ''
     for i in lista:
         exp = exp + str(i)
     
     return exp
+
+
+
+
+def regexp_a_postfix_v2(expresion  , output_stack):
+    operator_stack = estack()
+    token = set(expresion)
+    operations = set( '+*|' )
+    parenthesis = set( '()')
+    tr = token - operations - parenthesis
+    
+    contador = 0
+    previusval = 0 # parentesis
+    parentesislocation = []
+    partof_expression = []
+    for i in expresion:
+        if( i == '(' ):
+            parentesislocation.append(contador)   
+            previusval += 1 
+        if(i == ')'):
+            exp = ''
+            for i in range(parentesislocation[len(parentesislocation)-1], contador+1):
+                exp = exp + list(expresion)[i] 
+            try:
+                if list(expresion)[i+1] == '*':
+                    exp = exp + '*'
+            except:
+                None
+            
+            partof_expression.append(exp)
+            parentesislocation.pop()
+            previusval -= 1   
+        
+        if( previusval == 0 ) and ( i in tr ):
+            exp = i
+            try:
+                if list(expresion)[contador+1] == '*':
+                    exp = exp + '*'
+            except:
+                None
+            
+            partof_expression.append(exp)
+            
+        contador += 1
+            
+    operatorstack = []
+    letterstack = []
+    for i in partof_expression:
+        for e in i:
+            if e in tr:
+                letterstack.append(e)
+            if e in operations:
+                operatorstack.append(e)
+        
+        output_stack.push(list_to_exp(letterstack + operatorstack))
+        letterstack = []
+        operatorstack = []
+    
+    output = ''
+    for e in range( len(output_stack.getstack()) ):
+        if e != 0:
+            output = output + output_stack.getstack()[e] + '•'
+        else:
+            output = output + output_stack.getstack()[e]
+    
+        
+        
+   
+   
+    return output

@@ -98,15 +98,8 @@ def regex_to_nfa(postfix_regex):
 
     return final_nfa
 
-<<<<<<< HEAD
-# Ejemplo de uso:
-# a(a|b)*b
-postfix_expression = "a•ab|*"  # Expresión en postfix
-nfa = regex_to_nfa(postfix_expression)
-=======
 # Ejemplo de uso
 if __name__ == "__main__":
-    postfix_expression = "aab|*"  # Expresión en notación postfix
+    postfix_expression = "aa•"  # Expresión en notación postfix
     nfa = regex_to_nfa(postfix_expression)
     print("NFA generado y guardado en 'nfa_output.json'")
->>>>>>> prueba2nfa
