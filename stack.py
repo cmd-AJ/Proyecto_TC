@@ -45,51 +45,50 @@ class estack:
             
 
 
+def regexp_a_postfix(expression):
+    def precedence(op):
+        precedences = {'|': 1, '•': 2, '*': 3, '+': 3, '?': 3}
+        return precedences.get(op, 0)
 
+    def is_operator(c):
+        return c in {'|', '•', '*', '+', '?'}
 
+    output = []
+    operator_stack = []
 
+    # Formatear expresión para manejar la concatenación implícita
+    formatted_expression = ""
+    for i in range(len(expression)):
+        c1 = expression[i]
+        formatted_expression += c1
 
-def regexp_a_postfix(expresion  , output_stack):
-    operator_stack = estack()
-    token = set(expresion)
-    operations = set( '+*|' )
-    parenthesis = set( '()')
-    tr = token - operations - parenthesis
-    for i in expresion:
-        # operador
-        if (operator_stack.getvalue()+i == ')+') or (operator_stack.getvalue()+i == ')*'):
-            output_stack.push(i)
-            i = 'null'
-            operator_stack.keepvalue('')
-            
-        if (operator_stack.getvalue() in tr) and (i in tr) and (operator_stack.peek() != '|'):
-            output_stack.push('•')
-            operator_stack.keepvalue('')
+        # Agregar operador de concatenación explícito (•) si corresponde
+        if i + 1 < len(expression):
+            c2 = expression[i + 1]
+            if (c1 not in "|(" and c2 not in "|)*+?"):
+                formatted_expression += "•"
 
-        if i == '(' :
-            operator_stack.push(i)
-        elif i in tr:
-            output_stack.push(i) 
-            operator_stack.keepvalue(i)
-        elif i in operations:
-            if (i != '|'):
-                output_stack.push(str(i))
-            else:
-                operator_stack.push(str(i))
-            
-        elif i == ")":
-            operador = operator_stack.peek()
-            operator_stack.poplista()
-            output_stack.push(operador)
-            operator_stack.keepvalue(')')
-        
+    for char in formatted_expression:
+        if char.isalnum():  # Si es un símbolo alfanumérico
+            output.append(char)
+        elif char == '(':
+            operator_stack.append(char)
+        elif char == ')':
+            while operator_stack and operator_stack[-1] != '(':
+                output.append(operator_stack.pop())
+            operator_stack.pop()  # Eliminar el '(' del stack
+        elif is_operator(char):
+            while (operator_stack and operator_stack[-1] != '(' and
+                   precedence(operator_stack[-1]) >= precedence(char)):
+                output.append(operator_stack.pop())
+            operator_stack.append(char)
 
-    for e in operator_stack.getstack():
-        if e != "(":
-            output_stack.push(i)
-    
-    operator_stack.limpiarstack()
-    return output_stack
+    # Vaciar el resto del stack de operadores
+    while operator_stack:
+        output.append(operator_stack.pop())
+
+    return ''.join(output)
+
 
 
 def list_to_exp(lista):
