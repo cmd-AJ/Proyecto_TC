@@ -101,4 +101,3 @@ def list_to_exp(lista):
         exp = exp + str(i)
     
     return exp
-
