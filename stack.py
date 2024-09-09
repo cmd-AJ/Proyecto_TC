@@ -83,6 +83,9 @@ def regexp_a_postfix(expresion  , output_stack):
             output_stack.push(operador)
             operator_stack.keepvalue(')')
         
+    if (list(expresion)[len(expresion)-1] == '*' and list(expresion)[len(expresion)-2] in tr ) or list(expresion)[len(expresion)-1] in tr :
+        output_stack.push('•')
+        
 
     for e in operator_stack.getstack():
         if e != "(":

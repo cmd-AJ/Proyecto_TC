@@ -92,5 +92,6 @@ def regex_to_nfa(postfix_regex):
     return final_nfa
 
 # Ejemplo de uso:
-postfix_expression = "bb|*a.bb.a|*"  # Expresión en postfix
+# a(a|b)*b
+postfix_expression = "a•ab|*"  # Expresión en postfix
 nfa = regex_to_nfa(postfix_expression)

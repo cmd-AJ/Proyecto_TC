@@ -7,7 +7,7 @@ output_stack = stack.estack()
 
 def main():
     print("Bienvenidos\nPor favor inserten la expresión regular")
-    print("Tomar nota de estos símbolos\nOperadores:\n | OR uso: (a|b)\n * Estrella de Kleene uso: b*")
+    print("Tomar nota de estos símbolos\nOperadores:\n | OR uso: (a|b)\n * Estrella de Kleene uso: b*\n Epsilon como &")
     print(f"\033[1;33;40m TOMAR NOTA NO ES NECESARIO PONER • el algoritmo lo realiza por sí mismo \033[0m")
     print(f"\033[1;31;40m EJEMPLO DE PRUEBA :\033[0m   (b|b)*abb(a|b)*\n\n")
 
@@ -27,7 +27,7 @@ def main():
     print("AFN generado exitosamente.")
 
     # Exportar el AFN a JSON (si lo necesitas)
-    # nfa.export_nfa_to_json(nfa_automaton)
+    
 
     # Paso 3: Convertir el AFN en AFD usando el algoritmo de construcción de subconjuntos
     alphabet = set(lenguaje) - set("()*|")  # Extraer el alfabeto de la expresión regular
