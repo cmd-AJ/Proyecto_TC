@@ -87,7 +87,7 @@ def regex_to_nfa(postfix_regex):
 
             # Transiciones epsilon
             for epsilon_state in state.epsilon_transitions:
-                nfa_dict["FUNC"].append(f"{state.name},ε,{epsilon_state.name}")
+                nfa_dict["FUNC"].append(f"{state.name},$,{epsilon_state.name}")
                 add_state_to_json(epsilon_state)
 
     add_state_to_json(final_nfa.start_state)

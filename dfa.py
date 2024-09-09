@@ -1,3 +1,4 @@
+import json
 # dfa.py
 class DFA:
     def __init__(self):
@@ -5,6 +6,30 @@ class DFA:
         self.start_state = None
         self.accept_states = []
         self.transitions = {}  # {(frozenset(state), symbol): frozenset(next_state)}
+        self.simbols = []
+    
+    def toJson(self, alphabet):
+
+        def frozenset_to_list(fset):
+            return [state.name for state in fset]
+
+
+        transitions_serializable = {}
+        for (state_set, symbol), next_state_set in self.transitions.items():
+            transitions_serializable[f"({frozenset_to_list(state_set)}, {symbol})"] = frozenset_to_list(next_state_set)
+
+
+        json_data = {
+            "ESTADOS": [frozenset_to_list(state_set) for state_set in self.states],
+            "SIMBOLOS": list(alphabet),  # Assuming binary symbols, can be modified
+            "INICIO": frozenset_to_list(self.start_state),
+            "ACEPTACION": [frozenset_to_list(state_set) for state_set in self.accept_states],
+            "TRANSICIONES": transitions_serializable
+        }
+
+        # Save the JSON data to a file
+        with open('dfa.json', 'w') as f:
+            json.dump(json_data, f, indent=4)
 
 def epsilon_closure(states):
     """ Compute the epsilon closure of a set of states """
@@ -57,4 +82,5 @@ def nfa_to_dfa(nfa, alphabet):
             if next_set:
                 dfa.transitions[(current_set, symbol)] = next_set
 
+    dfa.toJson(alphabet)
     return dfa
