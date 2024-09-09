@@ -59,13 +59,13 @@ def regex_to_nfa(postfix_regex):
 
     final_nfa = stack.pop()
 
-    # Crear el JSON
+    # Crear el JSON en un formato similar al DFA
     nfa_dict = {
-        "Q": [],
-        "sigma": [],
-        "q0": final_nfa.start_state.name,
-        "F": [],
-        "FUNC": []
+        "ESTADOS": [],
+        "SIMBOLOS": [],
+        "INICIO": [final_nfa.start_state.name],
+        "ACEPTACION": [],
+        "TRANSICIONES": []
     }
 
     visited = set()
@@ -73,21 +73,21 @@ def regex_to_nfa(postfix_regex):
     def add_state_to_json(state):
         if state.name not in visited:
             visited.add(state.name)
-            nfa_dict["Q"].append(state.name)
+            nfa_dict["ESTADOS"].append(state.name)
 
             if state.is_accept:
-                nfa_dict["F"].append(state.name)
+                nfa_dict["ACEPTACION"].append(state.name)
 
             # Agregar las transiciones
             for symbol, next_state in state.transitions.items():
-                nfa_dict["FUNC"].append(f"{state.name},{symbol},{next_state.name}")
-                if symbol not in nfa_dict["sigma"]:  # Asegurarse de agregar el símbolo y no un índice numérico
-                    nfa_dict["sigma"].append(symbol)  # Almacenar los símbolos correctamente
+                nfa_dict["TRANSICIONES"].append(f"{state.name}->{symbol}->{next_state.name}")
+                if symbol not in nfa_dict["SIMBOLOS"]:
+                    nfa_dict["SIMBOLOS"].append(symbol)
                 add_state_to_json(next_state)
 
             # Transiciones epsilon
             for epsilon_state in state.epsilon_transitions:
-                nfa_dict["FUNC"].append(f"{state.name},$,{epsilon_state.name}")
+                nfa_dict["TRANSICIONES"].append(f"{state.name}->$->{epsilon_state.name}")
                 add_state_to_json(epsilon_state)
 
     add_state_to_json(final_nfa.start_state)
@@ -100,6 +100,6 @@ def regex_to_nfa(postfix_regex):
 
 # Ejemplo de uso
 if __name__ == "__main__":
-    postfix_expression = "aa•"  # Expresión en notación postfix
+    postfix_expression = "aab|*"  # Expresión en notación postfix
     nfa = regex_to_nfa(postfix_expression)
     print("NFA generado y guardado en 'nfa_output.json'")
