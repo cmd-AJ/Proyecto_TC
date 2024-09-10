@@ -11,6 +11,9 @@ class NFA:
     def __init__(self, start_state, accept_state):
         self.start_state = start_state
         self.accept_state = accept_state
+    
+    def laststate(self, name):
+        self.accept_state = State(name, True)
 
 def regex_to_nfa(postfix_regex):
     stack = []
@@ -23,31 +26,50 @@ def regex_to_nfa(postfix_regex):
         return state
 
     # Proceso para convertir el postfix a NFA
+
+    previouschar = ''
     for char in postfix_regex:
+        
         if char.isalnum():  # Símbolo del alfabeto
+            previouschar = char
             start_state = new_state()
-            accept_state = new_state(is_accept=True)
+            accept_state = new_state(is_accept=True) #prob
             start_state.transitions[char] = accept_state
             stack.append(NFA(start_state, accept_state))
+            
 
-        elif char == '*':  # Estrella de Kleene
-            nfa = stack.pop()
-            start_state = new_state()
-            accept_state = new_state(is_accept=True)
-            start_state.epsilon_transitions.append(nfa.start_state)
-            nfa.accept_state.epsilon_transitions.append(nfa.start_state)
-            nfa.accept_state.epsilon_transitions.append(accept_state)
-            stack.append(NFA(start_state, accept_state))
-
-        elif char == '|':  # Operador OR
+        elif char == '|':  # OR operator
             nfa2 = stack.pop()
             nfa1 = stack.pop()
             start_state = new_state()
             accept_state = new_state(is_accept=True)
+            
+            # Reset accept states of previous NFAs
+            nfa1.accept_state.is_accept = False
+            nfa2.accept_state.is_accept = False
+            
             start_state.epsilon_transitions.append(nfa1.start_state)
             start_state.epsilon_transitions.append(nfa2.start_state)
             nfa1.accept_state.epsilon_transitions.append(accept_state)
             nfa2.accept_state.epsilon_transitions.append(accept_state)
+            
+            stack.append(NFA(start_state, accept_state))
+
+        elif char == '*':  # Kleene star
+            nfa = stack.pop()
+            start_state = new_state()
+            accept_state = new_state(is_accept=True)
+            
+            # Reset accept state of the NFA before applying *
+            nfa.accept_state.is_accept = False
+            
+            start_state.epsilon_transitions.append(nfa.start_state)
+            nfa.accept_state.epsilon_transitions.append(nfa.start_state)
+            nfa.accept_state.epsilon_transitions.append(accept_state)
+            
+            # Allow epsilon transition from start to accept for zero occurrences
+            start_state.epsilon_transitions.append(accept_state)
+            
             stack.append(NFA(start_state, accept_state))
 
         elif char == '•':  # Concatenación
@@ -56,6 +78,10 @@ def regex_to_nfa(postfix_regex):
             nfa1.accept_state.is_accept = False  # El estado intermedio ya no es de aceptación
             nfa1.accept_state.epsilon_transitions.append(nfa2.start_state)
             stack.append(NFA(nfa1.start_state, nfa2.accept_state))
+        
+    
+
+
 
     final_nfa = stack.pop()
 
@@ -100,6 +126,6 @@ def regex_to_nfa(postfix_regex):
 
 # Ejemplo de uso
 if __name__ == "__main__":
-    postfix_expression = "aa•"  # Expresión en notación postfix
+    postfix_expression = "bb|*a•b•"  # Expresión en notación postfix
     nfa = regex_to_nfa(postfix_expression)
     print("NFA generado y guardado en 'nfa_output.json'")

@@ -47,7 +47,7 @@ class minimize_dfa:
         
         lista_transisiones = []
         for i in self.transitiones:
-            lista = i.split('->')
+            lista = i.split(' ,')
             lista[0] = self.reverse_dic[lista[0]]
             lista[2] = self.reverse_dic[lista[2]]
             lista_transisiones.append(lista[0] + ',' + lista[1] + ',' + lista[2])
@@ -71,7 +71,7 @@ class minimize_dfa:
             
         lista_transisiones = []
         for i in self.transitiones:
-            lista = i.split(',')
+            lista = i.split(' ,')
             lista[0] = self.diccionario[lista[0]]
             lista[2] = self.diccionario[lista[2]]
             lista_transisiones.append(lista[0] + ',' + lista[1] + ',' + lista[2])
@@ -167,7 +167,8 @@ s.convertir_subconjuntos_a_letras()
 
 print(f"\033[1;32;40m Tabla del AFD\033[0m")
 
-print(s.tabla_subcon())
+tablaafd = s.tabla_subcon()
+print(tablaafd)
 
 print('\n')
 
