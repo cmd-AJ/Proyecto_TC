@@ -1,0 +1,24 @@
+{
+    "ESTADOS": [
+        "A",
+        "B",
+        "CD"
+    ],
+    "SIMBOLOS": [
+        "b",
+        "a"
+    ],
+    "INICIO": [
+        "A"
+    ],
+    "ACEPTACION": [
+        "CD"
+    ],
+    "TRANSICIONES": [
+        "A,a,B",
+        "B,b,CD",
+        "B,a,CD",
+        "CD,b,CD",
+        "CD,a,CD"
+    ]
+}
