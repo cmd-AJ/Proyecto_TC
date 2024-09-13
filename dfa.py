@@ -16,7 +16,7 @@ class DFA:
 
         transitions_serializable = []
         for (state_set, symbol), next_state_set in self.transitions.items():
-            transitions_serializable.append(f"{str(set(frozenset_to_list(state_set)))}->{symbol}->{str(set(frozenset_to_list(next_state_set)))}")
+            transitions_serializable.append(f"{str(set(frozenset_to_list(state_set)))} ,{symbol} ,{str(set(frozenset_to_list(next_state_set)))}")
 
 
         json_data = {
