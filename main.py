@@ -1,4 +1,5 @@
 # main.py
+from minimize import minimize_dfa
 from nfa import regex_to_nfa  # Importamos la función regex_to_nfa desde nfa.py
 from stack import list_to_exp, regexp_a_postfix_v2  # Importamos la función regexp_a_postfix desde stack.py
 from dfa import nfa_to_dfa  # Mantén esta importación si tienes un archivo dfa.py
@@ -6,6 +7,14 @@ from dfa import nfa_to_dfa  # Mantén esta importación si tienes un archivo dfa
 # Declara el stack utilizado para hacer el algoritmo de Shunting Yard
 import stack  # Para usar estack
 output_stack = stack.estack()
+import json
+
+def tabla(path):
+    with open(path, 'r') as file:
+        data = json.load(file)
+    
+    
+
 
 def main():
     print("Bienvenidos\nPor favor inserten la expresión regular")
@@ -29,6 +38,9 @@ def main():
         print("Generando el AFN (Automata Finito No Determinista)...")
         nfa_automaton = regex_to_nfa(postfix_expression)
         print("AFN generado exitosamente.")
+        
+        
+        
     except Exception as e:
         print(f"Error al generar el AFN: {e}")
         return
@@ -42,6 +54,33 @@ def main():
     except Exception as e:
         print(f"Error al generar el AFD: {e}")
         return
+    
+    
+    try:
+        #Paso 4 minimizar
+        s = minimize_dfa('dfa.json')
+        s.convertir_subconjuntos_a_letras()
+
+        # Imprime la tabla del AFD
+        print(f"\033[1;32;40m Tabla del AFD\033[0m")
+        tabla_afd = s.tabla_subcon()
+        print(tabla_afd)
+
+        print('\n')
+
+        # Imprime la tabla de minimización
+        print(f"\033[1;34;40m Tabla de minimización\033[0m")
+        tabla_minimizacion = s.minimizacion_tabla()
+        print(tabla_minimizacion)
+        print()
+        print(f"\033[1;32;40m Tabla AFD MINIMIZADA\033[0m")
+        tabla_minimizada = s.exposetablaafd(tabla_minimizacion, tabla_afd)
+        print(tabla_minimizada)
+
+        print(s.tojson(tabla_minimizada))
+    except:
+        return
+
 
     # Paso 4: Recibir la cadena de prueba w y simular el AFD
     w = input("Ingrese la cadena a evaluar (w): ")

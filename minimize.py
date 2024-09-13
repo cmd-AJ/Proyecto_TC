@@ -130,9 +130,13 @@ class minimize_dfa:
             columns.append(indexing[len(indexing) - contador])
             contador += 1
 
+        contador = 1
         emptydata = {'Estados': indexing}
         for i in columns:
-            emptydata[i] = [''] * len(indexing)
+            emptydata[i] = ['-'] * (len(indexing)-contador)
+            emptydata[i] = emptydata[i] + ([''] * contador)
+            contador += 1
+            
 
         df = pandas.DataFrame(emptydata, index=indexing, columns=columns)
 
@@ -142,6 +146,8 @@ class minimize_dfa:
                 if estado_j is not None and estado_i != estado_j and indexing.index(estado_i) < indexing.index(estado_j):
                     if self.son_no_equivalentes(estado_i, estado_j):
                         df.loc[estado_i, estado_j] = 'X'
+        
+        df = df.drop(df.index[-1])
 
         return df
 
@@ -169,21 +175,132 @@ class minimize_dfa:
             return self.df_transition.loc[estado, simbolo]
         except KeyError:
             return None
+    
+    def exposetablaafd(self, tabla_minimizacion: pandas.DataFrame, tabla_afd: pandas.DataFrame):
+        index = list(tabla_minimizacion.index.array)
+        head = list(tabla_minimizacion.head())
+
+        dictionary = []
+        for i in head:
+            for e in index:
+                if tabla_minimizacion.loc[e,i] == '-':
+                    dictionary.append(str(e+i))
+        
+        contador = 0
+        for i in dictionary:
+            for e in i:
+                try:
+                    tabla_afd.loc[dictionary[contador]] = dict(tabla_afd.loc[e])
+                    tabla_afd = tabla_afd.drop(index=e)
+                except:
+                    None
+            contador += 1
+        
+        index = list(tabla_afd.index.array)
+        head = list(tabla_afd.head())
+        head.pop()
+        
+        for i in index:
+            for e in head:
+                for s in dictionary:
+                    if tabla_afd.loc[i,e] in s:
+                        tabla_afd.loc[i,e] = s
+        
+        
+        
+        return tabla_afd
+
+    def tojson(self, tablaafd: pandas.DataFrame):
+        index = list(tablaafd.index.array)
+        head = list(tablaafd.head())
+        
+        for i in index:
+            valor = '{'
+            if i not in self.diccionario and ( i != 'QT'):
+                listas = list(i)
+                for k in listas:
+                    valor = valor + self.diccionario[k]
+                valor = valor + '}'
+                self.diccionario[i] = valor
+            
+                    
+    
+        simbols = head
+        simbols.pop()
+        
+        for i in simbols:
+            for e in index:
+                if tablaafd.loc[e,i] != 'QT':
+                    tablaafd.loc[e,i] = self.diccionario[tablaafd.loc[e,i]]
+                if tablaafd.loc[e,i] == 'QT':
+                    self.diccionario['QT'] = 'QT'
+ 
+ 
+        
+        for e in index:
+            if e != 'QT':
+                tablaafd.loc[self.diccionario[e]] =  tablaafd.loc[e]
+                tablaafd = tablaafd.drop(e)
+        
+        inicio = []
+        for i in index:
+            i = self.diccionario[i]
+            if '-->' in tablaafd.loc[i,'salida']:
+                inicio.append(i)
+        
+        final = []
+        for i in index:
+            i = self.diccionario[i]
+            if '1' in tablaafd.loc[i,'salida']:
+                final.append(i)
+                
+        transicionies = []
+        for i in index:
+            i = self.diccionario[i]
+            for e in simbols:
+                transicionies.append(  i  + '->' + e + '->' + tablaafd.loc[i,e])
+                
+        estado = []
+        for e in index:
+            estado.append(self.diccionario[e])
+
+        
+        jhason = {
+            'ESTADOS': estado,
+            'SIMBOLOS': simbols,
+            'INICIO': inicio,
+            'ACEPTACION': final,
+            'TRANSICIONES': transicionies
+        }
+        
+        with open('dfa_min.json', 'w') as f:
+            json.dump(jhason, f, indent=4)
+                    
+        
 
 
 # Cargar y crear el AFD
+# pandas.set_option('display.max_columns', None)
 s = minimize_dfa('dfa.json')
 s.convertir_subconjuntos_a_letras()
 
 # Imprime la tabla del AFD
 print(f"\033[1;32;40m Tabla del AFD\033[0m")
-print(s.tabla_subcon())
+tabla_afd = s.tabla_subcon()
+print(tabla_afd)
 
 print('\n')
 
 # Imprime la tabla de minimización
 print(f"\033[1;34;40m Tabla de minimización\033[0m")
-print(s.minimizacion_tabla())
+tabla_minimizacion = s.minimizacion_tabla()
+print(tabla_minimizacion)
+print()
+print(f"\033[1;32;40m Tabla AFD MINIMIZADA\033[0m")
+tabla_minimizada = s.exposetablaafd(tabla_minimizacion, tabla_afd)
+print(tabla_minimizada)
+
+print(s.tojson(tabla_minimizada))
 
 
 
