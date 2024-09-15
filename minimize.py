@@ -46,7 +46,7 @@ class minimize_dfa:
 
         lista_transisiones = []
         for i in self.transitiones:
-            lista = i.split(' ,')
+            lista = i.split('->')
             lista[0] = self.reverse_dic[lista[0]]
             lista[2] = self.reverse_dic[lista[2]]
             lista_transisiones.append(lista[0] + ',' + lista[1] + ',' + lista[2])
@@ -119,6 +119,7 @@ class minimize_dfa:
         self.df_transition = df  # Guardar la tabla de transiciones para su uso posterior
 
         return df
+
 
     def minimizacion_tabla(self):
         indexing = list(self.statesLetters)

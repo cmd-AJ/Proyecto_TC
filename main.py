@@ -1,4 +1,5 @@
 # main.py
+from draw import drawing_grapgh
 from minimize import minimize_dfa
 from nfa import regex_to_nfa  # Importamos la función regex_to_nfa desde nfa.py
 from stack import list_to_exp, regexp_a_postfix_v2  # Importamos la función regexp_a_postfix desde stack.py
@@ -8,12 +9,86 @@ from dfa import nfa_to_dfa  # Mantén esta importación si tienes un archivo dfa
 import stack  # Para usar estack
 output_stack = stack.estack()
 import json
+import pandas as pd
 
 def tabla(path):
-    with open(path, 'r') as file:
-        data = json.load(file)
-    
-    
+        pd.set_option('display.max_columns', None)
+        pd.set_option('display.width', 1200)
+        # Load the JSON data
+        with open(path, 'r') as file:
+            data = json.load(file)
+        
+        # Extract states and symbols
+        estados = data['ESTADOS']  # Treat states as literal strings
+        simbolos = data['SIMBOLOS']
+        inicio = data['INICIO']  # Start state as a literal string
+        aceptacion = data['ACEPTACION']  # Acceptance states as literal strings
+        transiciones = data['TRANSICIONES']
+
+        headers = simbolos.copy()  # Copy the symbols as headers
+        if 'nfa' in path:
+            headers.append('$')
+            simbolos.append('$')
+        headers.append('salida')   # Add 'salida' for start/acceptance status
+
+        # States letters for index
+        index = estados
+        emptydata = {
+            
+        }
+
+        # Initialize table with '0's for every state and symbol
+        for symbol in headers:
+            emptydata[symbol] = ['0'] * len(index)
+            
+        
+
+        # Create the DataFrame
+        df = pd.DataFrame(emptydata, index=index, columns= headers)
+        
+
+        # Mark start and accept states in the 'salida' column
+        for e in aceptacion:
+            if e in aceptacion:
+                df.loc[e, 'salida'] = '1'  # Mark accept states
+        
+        for e in inicio:
+            df.loc[e, 'salida'] = '--> ' + df.loc[e, 'salida']  # Mark start state
+            
+
+        # Fill transitions based on the TRANSICIONES data
+        for transition in transiciones:
+            parts = transition.split('->')
+            from_state = parts[0]  # No need to strip {} since it's treated as string
+            symbol = parts[1]
+            to_state = parts[2]
+
+            # Get state index based on the state strings in 'estados'
+            from_state_idx = estados.index(from_state)
+            to_state_idx = estados.index(to_state)
+
+            # Set the transition in the dataframe
+            df.loc[from_state, symbol] = to_state
+        
+        
+
+        # Handle null transitions (QT row)
+        has_null = False
+        for symbol in simbolos:
+            for state_name in index:
+                if df.loc[state_name, symbol] == '0':
+                    df.loc[state_name, symbol] = 'QT'
+                    has_null = True
+
+        if has_null:
+            # Add QT row if null transitions exist
+            qt_row = {symbol: 'QT' for symbol in headers}
+            qt_row['salida'] = '0'
+            df = pd.concat([df, pd.DataFrame(qt_row, index=['QT'])])
+            index.append('QT')
+            
+
+        return df
 
 
 def main():
@@ -39,7 +114,8 @@ def main():
         nfa_automaton = regex_to_nfa(postfix_expression)
         print("AFN generado exitosamente.")
         
-        
+        print(tabla('nfa_output.json'))   
+        drawing_grapgh('nfa_output.json')    
         
     except Exception as e:
         print(f"Error al generar el AFN: {e}")
@@ -51,6 +127,8 @@ def main():
         print("Convirtiendo el AFN a AFD (Automata Finito Determinista)...")
         dfa_automaton = nfa_to_dfa(nfa_automaton, alphabet)
         print("AFD generado exitosamente.")
+        print(tabla('dfa.json'))
+        drawing_grapgh('dfa.json')
     except Exception as e:
         print(f"Error al generar el AFD: {e}")
         return
@@ -77,8 +155,11 @@ def main():
         tabla_minimizada = s.exposetablaafd(tabla_minimizacion, tabla_afd)
         print(tabla_minimizada)
 
-        print(s.tojson(tabla_minimizada))
-    except:
+        s.tojson(tabla_minimizada)
+        drawing_grapgh('dfa_min.json')
+        
+    except Exception as e:
+        print(f"Error al generar el AFD MINIMIZADA: {e}")
         return
 
 

@@ -1,4 +1,6 @@
 import json
+import pandas as pd
+
 # dfa.py
 class DFA:
     def __init__(self):
@@ -16,7 +18,7 @@ class DFA:
 
         transitions_serializable = []
         for (state_set, symbol), next_state_set in self.transitions.items():
-            transitions_serializable.append(f"{str(set(frozenset_to_list(state_set)))} ,{symbol} ,{str(set(frozenset_to_list(next_state_set)))}")
+            transitions_serializable.append(f"{str(set(frozenset_to_list(state_set)))}->{symbol}->{str(set(frozenset_to_list(next_state_set)))}")
 
 
         json_data = {
@@ -30,6 +32,8 @@ class DFA:
         # Save the JSON data to a file
         with open('dfa.json', 'w') as f:
             json.dump(json_data, f, indent=4)
+    
+    
 
 def epsilon_closure(states):
     """ Compute the epsilon closure of a set of states """
@@ -84,3 +88,4 @@ def nfa_to_dfa(nfa, alphabet):
 
     dfa.toJson(alphabet)
     return dfa
+
