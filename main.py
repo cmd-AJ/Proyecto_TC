@@ -1,5 +1,6 @@
 # main.py
 from draw import drawing_grapgh
+import time
 from minimize import minimize_dfa
 from nfa import regex_to_nfa  # Importamos la función regex_to_nfa desde nfa.py
 from stack import list_to_exp, regexp_a_postfix_v2  # Importamos la función regexp_a_postfix desde stack.py
@@ -168,19 +169,25 @@ def main():
 
     try:
         # Simulación del AFD con la cadena w
+        start_time = time.perf_counter()
         result, transitions = simulate_dfa(dfa_automaton, w)
+        end_time = time.perf_counter()
+        elapsed_time = (end_time - start_time)*1000
 
         # Paso 5: Imprimir el resultado de la simulación y las transiciones realizadas
         print(f"\033[1;34;40m Resultado de la simulación: {result}\033[0m")
         print("Transiciones realizadas:")
         for t in transitions:
             print(t)
+        
+        print('Tiempo en validar cadena ' + str(elapsed_time) + ' milisegundos')
     except Exception as e:
         print(f"Error en la simulación del AFD: {e}")
 
 
 # Simulación del AFD con la cadena w
 def simulate_dfa(dfa, input_string):
+
     current_state = dfa.start_state
     transitions_made = []
 
@@ -197,6 +204,7 @@ def simulate_dfa(dfa, input_string):
         return "SÍ", transitions_made
     else:
         return "NO", transitions_made
+
 
 if __name__ == "__main__":
     main()

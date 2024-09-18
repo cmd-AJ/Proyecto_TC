@@ -180,18 +180,23 @@ class minimize_dfa:
     def exposetablaafd(self, tabla_minimizacion: pandas.DataFrame, tabla_afd: pandas.DataFrame):
         index = list(tabla_minimizacion.index.array)
         head = list(tabla_minimizacion.head())
-
+        
         dictionary = []
         for i in head:
             for e in index:
                 if tabla_minimizacion.loc[e,i] == '-':
                     dictionary.append(str(e+i))
         
+
+        
         contador = 0
         for i in dictionary:
             for e in i:
                 try:
+                    
                     tabla_afd.loc[dictionary[contador]] = dict(tabla_afd.loc[e])
+                    if tabla_afd.loc[dictionary[contador], 'salida'] == '--> 0':
+                        del dictionary[contador]
                     tabla_afd = tabla_afd.drop(index=e)
                 except:
                     None

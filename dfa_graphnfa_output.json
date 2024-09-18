@@ -18,8 +18,6 @@ digraph {
 	q15 [shape=circle]
 	q19 [shape=circle]
 	q21 [shape=circle]
-	q22 [shape=circle]
-	q23 [shape=circle]
 	q16 [shape=circle]
 	q17 [shape=circle]
 	q2 [shape=circle]
@@ -43,8 +41,6 @@ digraph {
 	q15 -> q19 [label="$"]
 	q19 -> q18 [label="$"]
 	q19 -> q21 [label="$"]
-	q21 -> q22 [label="$"]
-	q22 -> q23 [label=b]
 	q18 -> q16 [label="$"]
 	q16 -> q17 [label=b]
 	q17 -> q19 [label="$"]
@@ -53,6 +49,8 @@ digraph {
 	q2 -> q3 [label=b]
 	q3 -> q5 [label="$"]
 	q6 -> q7 [label="$"]
+	"" [shape=point]
 	q6 [shape=ellipse style=bold]
-	q23 [shape=doublecircle]
+	"" -> q6
+	q21 [shape=doublecircle]
 }

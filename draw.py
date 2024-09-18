@@ -26,7 +26,9 @@ def drawing_grapgh(path:str):
 
     
     for start_state in data['INICIO']:
+        dot.node('', shape='point' )
         dot.node(start_state, shape='ellipse', style='bold')
+        dot.edge('', start_state)
 
     for accept_state in data['ACEPTACION']:
         dot.node(accept_state, shape='doublecircle')
