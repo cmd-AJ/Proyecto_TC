@@ -1,4 +1,6 @@
 # main.py
+#Hecho por Kou, Esteban Y Jo
+
 from draw import drawing_grapgh
 import time
 from minimize import minimize_dfa
@@ -208,3 +210,5 @@ def simulate_dfa(dfa, input_string):
 
 if __name__ == "__main__":
     main()
+
+
